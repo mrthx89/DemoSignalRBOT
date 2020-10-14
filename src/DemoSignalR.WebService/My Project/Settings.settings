@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="URI_SignalR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:8801</Value>
+    </Setting>
+    <Setting Name="NamaPerusahaan" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Elliteserv</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
