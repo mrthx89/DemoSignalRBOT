@@ -3,8 +3,8 @@ Imports DemoSignalR.Model
 Imports DemoSignalR.Client.Data.Constant
 
 Public Class frmClient
-    Private hubConnection As HubConnection
-    Private hubProxy As IHubProxy
+    Private Property hubConnection As HubConnection
+    Private Property hubProxy As IHubProxy
 
     Public Sub New()
 
@@ -12,7 +12,7 @@ Public Class frmClient
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        btnRetrive.PerformClick()
+        'btnRetrive.PerformClick()
     End Sub
 
     '<summary>
