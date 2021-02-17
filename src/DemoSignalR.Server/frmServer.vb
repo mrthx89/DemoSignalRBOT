@@ -20,7 +20,8 @@ Public Class frmServer
         Catch ex As Exception
 
         End Try
-        Repository.RepWA.ChromeClose()
+        Dim hasil = Repository.RepWA.ChromeClose()
+        WriteToConsole(False, hasil.Message)
         DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
@@ -29,8 +30,54 @@ Public Class frmServer
     'running. This method Is called asynchronously from Button_Start.
     '</summary>
     Private Sub StartServer()
+        Dim Hasil As Model.Result
         Try
-            signalR = WebApp.Start(URI_SignalR)
+            Hasil = Repository.RepWA.CheckWAOnReady()
+            If Hasil.Result Then
+                If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
+                    Using frmQRCode As New frmQRCode(Hasil)
+                        Try
+                            If frmQRCode.ShowDialog() = DialogResult.OK Then
+                                signalR = WebApp.Start(URI_SignalR)
+
+                                Button2.Invoke(Sub()
+                                                   Button2.Enabled = True
+                                               End Sub)
+
+                                WriteToConsole(True, "Server started at " &
+                                               URI_SignalR)
+                            End If
+                        Catch ex As Exception
+                            WriteToConsole(False, "Server failed to start. A server is already running on " &
+                                           URI_SignalR)
+                            'Re-enable button to let user try to start server again
+
+                            'Me.this.Invoke
+                            Button1.Invoke(Sub()
+                                               Button1.Enabled = True
+                                           End Sub)
+                        End Try
+                    End Using
+                Else
+                    signalR = WebApp.Start(URI_SignalR)
+
+                    Button2.Invoke(Sub()
+                                       Button2.Enabled = True
+                                   End Sub)
+
+                    WriteToConsole(True, "Server started at " &
+                                   URI_SignalR)
+                End If
+            Else
+                WriteToConsole(False, "Chrome is Not Started." &
+                           URI_SignalR)
+                'Re-enable button to let user try to start server again
+
+                'Me.this.Invoke
+                Button1.Invoke(Sub()
+                                   Button1.Enabled = True
+                               End Sub)
+            End If
         Catch ex As Exception
             WriteToConsole(False, "Server failed to start. A server is already running on " &
                            URI_SignalR)
@@ -42,14 +89,6 @@ Public Class frmServer
                            End Sub)
             Exit Sub
         End Try
-
-        Button2.Invoke(Sub()
-                           Button2.Enabled = True
-                       End Sub)
-
-        WriteToConsole(True, "Server started at " &
-                       URI_SignalR)
-
     End Sub
 
     '<summary>
@@ -77,7 +116,18 @@ Public Class frmServer
             [Public].ClientForm.Focus()
         End If
 
-        lstConsole.Items.Add(message)
+        If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
+            System.IO.Directory.CreateDirectory(Application.StartupPath & "\Log\")
+        End If
+
+        Dim FileName As String = Application.StartupPath & "\Log\Server_" & Now.ToString("yyyyMMdd") & ".txt"
+        Dim Log As String = "[" & Now.ToString("yyyy-MM-dd HH:mm:ss") & "] : " & message
+        Using myStream As New System.IO.StreamWriter(FileName, True)
+            myStream.AutoFlush = True
+            myStream.WriteLine(Log)
+            myStream.Flush()
+        End Using
+        lstConsole.Items.Add(Log)
     End Sub
     Private Sub frmServer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         If Not IsNothing(signalR) Then
@@ -88,13 +138,34 @@ Public Class frmServer
 
     Private Sub frmServers_Load(sender As Object, e As EventArgs) Handles Me.Load
         LoadElementWA()
-        Repository.RepWA.ChromeConnect()
+        Dim hasil = Repository.RepWA.ChromeConnect()
+        WriteToConsole(False, hasil.Message)
     End Sub
 
     Private Sub LoadElementWA()
         Dim Response As String = ""
+        Dim uri As Uri = Nothing
         Try
-            Dim uri As New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
+            'Buka Log sebelumnya
+            If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
+                System.IO.Directory.CreateDirectory(Application.StartupPath & "\Log\")
+            End If
+
+            Dim FileName As String = Application.StartupPath & "\Log\Server_" & Now.ToString("yyyyMMdd") & ".txt"
+            If System.IO.File.Exists(FileName) Then
+                Using myStream As New System.IO.StreamReader(FileName)
+                    While Not myStream.Read
+                        lstConsole.Items.Add(myStream.ReadLine)
+                    End While
+                End Using
+            End If
+
+            'VPoint
+            'uri = New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
+
+            'CtrlSoftID
+            uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
+
             Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
             Console.WriteLine(Response)
             If Response IsNot Nothing AndAlso Response <> "" Then
@@ -107,7 +178,10 @@ Public Class frmServer
                                                        .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
                                                        .ELEMENT_PROFILE_7 = "span[data-icon='send']",
                                                        .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
-                                                       .ELEMENT_PROFILE_9 = "input[type='file']"}
+                                                       .ELEMENT_PROFILE_9 = "input[type='file']",
+                                                       .ELEMENT_PROFILE_10 = "_1yHR2",
+                                                       .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
+                                                       .ELEMENT_PROFILE_12 = "data-ref"}
             End If
         Catch ex As Exception
             ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
@@ -117,15 +191,10 @@ Public Class frmServer
                                                        .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
                                                        .ELEMENT_PROFILE_7 = "span[data-icon='send']",
                                                        .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
-                                                       .ELEMENT_PROFILE_9 = "input[type='file']"}
-
-            'lbCredit.Text = "Credit Thanks To :" & vbCrLf &
-            '                "Load Error " & ex.Message
-        Finally
-            'lbCredit.AllowHtmlString = True
-            'lbCredit.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap
-            'lbCredit.Appearance.Options.UseTextOptions = True
-            'lbCredit.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.Vertical
+                                                       .ELEMENT_PROFILE_9 = "input[type='file']",
+                                                       .ELEMENT_PROFILE_10 = "_1yHR2",
+                                                       .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
+                                                       .ELEMENT_PROFILE_12 = "data-ref"}
         End Try
     End Sub
 End Class

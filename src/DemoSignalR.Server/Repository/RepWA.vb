@@ -114,42 +114,149 @@ Label_0237:
         Public Shared pagesource As String
         Public Shared [options] As ChromeOptions = Nothing
 
-        Public Shared Function ChromeClose() As Boolean
-            Dim flag As Boolean = False, i As Integer = 0
-            Try
-                'If System.IO.Directory.Exists(Application.StartupPath & "\Cookies\") Then
-                '    System.IO.Directory.CreateDirectory(Application.StartupPath & "\Cookies\")
-                'End If
-                'For Each file In System.IO.Directory.GetFiles(Application.StartupPath & "\Cookies\")
-                '    System.IO.File.Delete(file)
-                'Next
+        Public Shared Function CheckWAOnReady() As Model.Result
+            Dim result As New Model.Result(False, "Tidak ditemukan", Nothing)
+            Dim URI As String = "https://web.whatsapp.com"
+            Dim UlangProses As Boolean = False
+            If chromestarted AndAlso driver IsNot Nothing Then
+                If chromestarted AndAlso driver IsNot Nothing Then
+                    Try
+Label_1:
+                        pagesource = driver.PageSource
+                        If Not pagesource.Contains(ElementWA.ELEMENT_PROFILE_4) Then
+                            If UlangProses Then
+                                Return GetQRCode()
+                            Else
+                                driver.Navigate.GoToUrl(URI)
+                                Thread.Sleep(3000)
+                                UlangProses = True
+                                GoTo Label_1
+                            End If
+                        Else
+                            With result
+                                .Result = True
+                                .Message = "Whatsapp On Ready"
+                                .Value = Nothing
+                            End With
+                        End If
+                    Catch ex As Exception
+                        With result
+                            .Result = False
+                            .Message = "Whatsapp not Ready : " & ex.Message
+                            .Value = Nothing
+                        End With
+                    End Try
+                Else
+                    With result
+                        .Result = False
+                        .Message = "Service is not Running."
+                        .Value = Nothing
+                    End With
+                End If
+            End If
 
-                'For Each cookies In driver.Manage.Cookies.AllCookies
-                '    i += 1
-                '    System.IO.File.Create(Application.StartupPath & "\Cookies\" & i & ".txt")
-                '    System.IO.File.AppendAllText(Application.StartupPath & "\Cookies\" & i & ".txt", cookies.ToString)
-                'Next
-                driver.Close()
-                driver.Dispose()
+            Return result
+        End Function
+
+        Public Shared Function GetQRCode() As Model.Result
+            Dim result As New Model.Result(False, "Tidak ditemukan", Nothing)
+            Dim URI As String = "https://web.whatsapp.com"
+            Dim UlangProses As Boolean = False, iUlang As Integer = 0
+            If chromestarted AndAlso driver IsNot Nothing Then
+                If chromestarted AndAlso driver IsNot Nothing Then
+                    Try
+Label_1:
+                        pagesource = driver.PageSource
+                        If iUlang <= 3 AndAlso pagesource.Contains(ElementWA.ELEMENT_PROFILE_11) Then
+                            driver.Navigate.GoToUrl(URI)
+                            Thread.Sleep(3000)
+                            iUlang += 1
+                            GoTo Label_1
+                        End If
+
+                        If pagesource.Contains(ElementWA.ELEMENT_PROFILE_10) Then
+                            Dim Data As String = driver.FindElementByClassName(ElementWA.ELEMENT_PROFILE_10).GetAttribute(ElementWA.ELEMENT_PROFILE_12)
+                            With result
+                                .Result = True
+                                .Message = "Whatsapp QRCode Ready"
+                                .Value = Data
+                            End With
+                        Else
+                            If UlangProses Then
+                                With result
+                                    .Result = False
+                                    .Message = "Whatsapp Not Ready"
+                                    .Value = Nothing
+                                End With
+                            Else
+                                driver.Navigate.GoToUrl(URI)
+                                Thread.Sleep(3000)
+                                UlangProses = True
+                                GoTo Label_1
+                            End If
+                        End If
+                    Catch ex As Exception
+                        With result
+                            .Result = False
+                            .Message = "Whatsapp not Ready : " & ex.Message
+                            .Value = Nothing
+                        End With
+                    End Try
+                Else
+                    With result
+                        .Result = False
+                        .Message = "Service is not Running."
+                        .Value = Nothing
+                    End With
+                End If
+            End If
+            Return result
+        End Function
+
+        Public Shared Function ChromeClose() As Model.Result
+            Dim Hasil As New Model.Result(False, "", Nothing)
+            Dim i As Integer = 0
+            Try
+                If driver IsNot Nothing Then
+                    driver.Close()
+                    driver.Dispose()
+                End If
                 driver = Nothing
                 Application.ExitThread()
 
-                flag = True
+                With Hasil
+                    .Result = True
+                    .Message = "Chrome is Stopped."
+                    .Value = ""
+                End With
             Catch ex As Exception
-                flag = False
+                With Hasil
+                    .Result = False
+                    .Message = "Err : " & ex.Message
+                    .Value = Nothing
+                End With
             End Try
-            chromestarted = Not flag
-            Return flag
+            chromestarted = Not Hasil.Result
+            Return Hasil
         End Function
 
-        Public Shared Function ChromeConnect() As Boolean
-            Dim flag As Boolean = False
+        Public Shared Function ChromeConnect() As Model.Result
+            Dim Hasil As New Model.Result(False, "", Nothing)
+
             Dim argumentsToAdd As String()
+            Dim service As ChromeDriverService
             Try
+                If driver IsNot Nothing Then
+                    driver.Close()
+                    driver.Dispose()
+                End If
+                driver = Nothing
+
                 'System.setProperty("webdriver.chrome.driver", "ChromeDriverPath")
-                Dim service As ChromeDriverService = ChromeDriverService.CreateDefaultService
+                service = ChromeDriverService.CreateDefaultService()
                 service.HideCommandPromptWindow = True
-                options = New ChromeOptions
+
+                [options] = New ChromeOptions
                 'Hide Windows
                 'argumentsToAdd = New String() {
                 '    "--window-position=-32000,-32000",
@@ -162,16 +269,30 @@ Label_0237:
                 'argumentsToAdd = New String() {
                 '    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech"
                 '}
-                options.AddArguments(argumentsToAdd)
+                [options].AddArguments(argumentsToAdd)
                 driver = New ChromeDriver(service, options)
                 driver.Navigate.GoToUrl("https://web.whatsapp.com")
+                Thread.Sleep(2000)
                 pagesource = driver.PageSource
-                flag = True
-            Catch obj1 As Exception
-                flag = False
+                With Hasil
+                    .Result = True
+                    .Message = "Chrome is Started."
+                    .Value = pagesource
+                End With
+            Catch ex As Exception
+                If driver IsNot Nothing Then
+                    driver.Close()
+                    driver.Dispose()
+                End If
+                driver = Nothing
+                With Hasil
+                    .Result = False
+                    .Message = "ERR Starting Chrome : " & ex.Message
+                    .Value = Nothing
+                End With
             End Try
-            chromestarted = flag
-            Return flag
+            chromestarted = Hasil.Result
+            Return Hasil
         End Function
     End Class
 End Namespace

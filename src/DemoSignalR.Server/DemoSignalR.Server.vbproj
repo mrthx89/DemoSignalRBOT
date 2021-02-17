@@ -91,6 +91,11 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="QRCoder, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QRCoder.1.4.1\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -110,6 +115,7 @@
     <Reference Include="WebDriver.Support, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.Support.3.141.0\lib\net45\WebDriver.Support.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -130,6 +136,12 @@
       <DependentUpon>frmClient.vb</DependentUpon>
     </Compile>
     <Compile Include="frmClient.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmQRCode.Designer.vb">
+      <DependentUpon>frmQRCode.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmQRCode.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmServer.Designer.vb">
@@ -165,6 +177,9 @@
     <EmbeddedResource Include="frmClient.resx">
       <DependentUpon>frmClient.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmQRCode.resx">
+      <DependentUpon>frmQRCode.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmServer.resx">
       <DependentUpon>frmServer.vb</DependentUpon>

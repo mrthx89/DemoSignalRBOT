@@ -10,7 +10,7 @@
                     System.IO.File.Create(Application.StartupPath & "\Log\" & fileName)
                 End If
 
-                Using myStream As New System.IO.StreamWriter(Application.StartupPath & "\Log\" & fileName)
+                Using myStream As New System.IO.StreamWriter(Application.StartupPath & "\Log\" & fileName, True)
                     myStream.AutoFlush = True
                     myStream.WriteLine(MemoEdit.Text)
                     myStream.Flush()
