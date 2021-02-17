@@ -54,6 +54,12 @@ namespace DemoSignalR.Model
 
         [JsonProperty("Message")]
         public string Message { get; set; }
+
+        [JsonProperty("Image")]
+        public string Image { get; set; }
+
+        [JsonProperty("File")]
+        public string File { get; set; }
     }
 
 

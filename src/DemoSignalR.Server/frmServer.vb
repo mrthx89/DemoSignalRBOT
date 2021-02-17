@@ -92,21 +92,33 @@ Public Class frmServer
     End Sub
 
     Private Sub LoadElementWA()
+        Dim Response As String = ""
         Try
             Dim uri As New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
-            Dim Response As String = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
+            Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
             Console.WriteLine(Response)
             If Response IsNot Nothing AndAlso Response <> "" Then
-                ElementWA = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Model.Element_WA)(Response)
+                ElementWA = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Model.Element_WA)(Response.Replace(vbLf & vbTab, ""))
             Else
                 ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
                                                        .ELEMENT_PROFILE_3 = "_35EW6",
                                                        .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
                                                        .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
                                                        .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
-                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']"}
+                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']",
+                                                       .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
+                                                       .ELEMENT_PROFILE_9 = "input[type='file']"}
             End If
         Catch ex As Exception
+            ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
+                                                       .ELEMENT_PROFILE_3 = "_35EW6",
+                                                       .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
+                                                       .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
+                                                       .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
+                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']",
+                                                       .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
+                                                       .ELEMENT_PROFILE_9 = "input[type='file']"}
+
             'lbCredit.Text = "Credit Thanks To :" & vbCrLf &
             '                "Load Error " & ex.Message
         Finally

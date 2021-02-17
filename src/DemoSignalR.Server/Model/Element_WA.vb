@@ -6,5 +6,7 @@
         Public Property ELEMENT_PROFILE_5 As String
         Public Property ELEMENT_PROFILE_6 As String
         Public Property ELEMENT_PROFILE_7 As String
+        Public Property ELEMENT_PROFILE_8 As String
+        Public Property ELEMENT_PROFILE_9 As String
     End Class
 End Namespace

@@ -4,6 +4,7 @@ Imports System.IO
 Imports System.Xml.Serialization
 Imports System.Net
 Imports System.Net.NetworkInformation
+Imports System.Net.Cache
 
 Namespace Repository
     Public Class Utils
@@ -262,6 +263,8 @@ Namespace Repository
                 If jsonDataBytes IsNot Nothing Then
                     request.ContentLength = jsonDataBytes.Length
                 End If
+                ' Define a cache policy for this request only.
+                request.CachePolicy = New HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore)
                 request.ContentType = contentType
                 request.Method = method
                 'request.Timeout = 60000

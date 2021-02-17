@@ -22,7 +22,10 @@ Namespace Repository
         End Sub
 
         <STAThread()>
-        Public Shared Function SendWA_BOT_Bebas(ByVal Phone As String, ByVal Message As String, ByVal Gambar As Image) As String
+        Public Shared Function SendWA_BOT_Bebas(ByVal Phone As String,
+                                                ByVal Message As String,
+                                                ByVal Gambar As Image,
+                                                ByVal File As String) As String
             If chromestarted AndAlso driver IsNot Nothing Then
                 Try
 Label_03A0:
@@ -40,7 +43,7 @@ Label_03A0:
                             GoTo Label_03A0
                         End If
                         driver.Navigate.GoToUrl(URI)
-
+                        Thread.Sleep(3000)
 Label_01FB:
                         Try
                             If Not driver.PageSource.Contains((ElementWA.ELEMENT_PROFILE_4.ToString & """")) Then
@@ -49,30 +52,42 @@ Label_01FB:
 
 Label_0237:
                             Try
-                                Thread.Sleep(&HBB8)
+                                Thread.Sleep(3000)
                                 Dim element2 As IWebElement = driver.FindElement(By.XPath(ElementWA.ELEMENT_PROFILE_5.ToString))
 
                                 Clipboard.SetText(Pesan)
                                 element2.SendKeys((Keys.Control & "v"))
-                                Thread.Sleep(&HBB8)
-                                If Gambar IsNot Nothing Then
-                                    Clipboard.SetImage(Gambar)
-                                    element2.SendKeys((Keys.Control & "v"))
-                                    Thread.Sleep(&HBB8)
+                                Thread.Sleep(3000)
 
-                                    Dim element4 As IWebElement = driver.FindElement(By.CssSelector(ElementWA.ELEMENT_PROFILE_6.ToString))
-                                    element4.Click()
-                                    element4 = Nothing
-                                    Thread.Sleep(&HFA0)
-                                    element2 = Nothing
-                                    Thread.Sleep(&H1388)
-                                Else
+                                If (Gambar Is Nothing AndAlso File Is Nothing) Then
                                     Dim element4 As IWebElement = driver.FindElement(By.CssSelector(ElementWA.ELEMENT_PROFILE_7.ToString))
                                     element4.Click()
                                     element4 = Nothing
-                                    Thread.Sleep(&HFA0)
+                                    Thread.Sleep(4000)
                                     element2 = Nothing
-                                    Thread.Sleep(&H1388)
+                                    Thread.Sleep(5000)
+                                Else
+                                    If File IsNot Nothing Then
+                                        'To send attachments
+                                        'click to add
+                                        driver.FindElement(By.CssSelector(ElementWA.ELEMENT_PROFILE_8)).Click()
+                                        'add file To send by file path
+                                        driver.FindElement(By.CssSelector(ElementWA.ELEMENT_PROFILE_9)).SendKeys(File)
+                                        Thread.Sleep(3000)
+                                    End If
+
+                                    If Gambar IsNot Nothing Then
+                                        Clipboard.SetImage(Gambar)
+                                        element2.SendKeys((Keys.Control & "v"))
+                                        Thread.Sleep(3000)
+                                    End If
+
+                                    Dim element4 As IWebElement = driver.FindElement(By.CssSelector(ElementWA.ELEMENT_PROFILE_7.ToString))
+                                    element4.Click()
+                                    element4 = Nothing
+                                    Thread.Sleep(4000)
+                                    element2 = Nothing
+                                    Thread.Sleep(5000)
                                 End If
                             Catch exception4 As Exception
                                 Console.WriteLine(exception4.Message)
@@ -129,11 +144,24 @@ Label_0237:
 
         Public Shared Function ChromeConnect() As Boolean
             Dim flag As Boolean = False
+            Dim argumentsToAdd As String()
             Try
+                'System.setProperty("webdriver.chrome.driver", "ChromeDriverPath")
                 Dim service As ChromeDriverService = ChromeDriverService.CreateDefaultService
                 service.HideCommandPromptWindow = True
                 options = New ChromeOptions
-                Dim argumentsToAdd As String() = New String() {(ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech")}
+                'Hide Windows
+                'argumentsToAdd = New String() {
+                '    "--window-position=-32000,-32000",
+                '    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech"
+                '}
+                argumentsToAdd = New String() {
+                    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech"
+                }
+                'Visible Windows
+                'argumentsToAdd = New String() {
+                '    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech"
+                '}
                 options.AddArguments(argumentsToAdd)
                 driver = New ChromeDriver(service, options)
                 driver.Navigate.GoToUrl("https://web.whatsapp.com")
