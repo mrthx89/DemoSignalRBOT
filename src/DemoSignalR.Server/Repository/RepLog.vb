@@ -22,6 +22,28 @@
             End Try
         End Function
 
+        Public Shared Function SaveLog(ByVal fileName As String, ByVal Message As String, ByVal Append As Boolean) As Boolean
+            Try
+                If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
+                    System.IO.Directory.CreateDirectory(Application.StartupPath & "\Log\")
+                End If
+
+                If Not System.IO.File.Exists(Application.StartupPath & "\Log\" & fileName) Then
+                    System.IO.File.Create(Application.StartupPath & "\Log\" & fileName)
+                End If
+
+                Using myStream As New System.IO.StreamWriter(Application.StartupPath & "\Log\" & fileName, Append)
+                    myStream.AutoFlush = True
+                    myStream.WriteLine(Message)
+                    myStream.Flush()
+                End Using
+
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
+
         Public Shared Function ReadLog(ByVal fileName As String, ByVal MemoEdit As TextBox) As Boolean
             Try
                 If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then

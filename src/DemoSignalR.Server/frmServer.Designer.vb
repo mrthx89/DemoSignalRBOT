@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmServer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,11 +20,13 @@ Partial Class frmServer
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.lstConsole = New System.Windows.Forms.ListBox()
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Button1
@@ -53,11 +55,32 @@ Partial Class frmServer
         Me.lstConsole.Size = New System.Drawing.Size(517, 303)
         Me.lstConsole.TabIndex = 18
         '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(12, 348)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(117, 23)
+        Me.Button3.TabIndex = 19
+        Me.Button3.Text = "Tambah &BOT"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(412, 348)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(117, 23)
+        Me.Button4.TabIndex = 20
+        Me.Button4.Text = "Send from External"
+        Me.Button4.UseVisualStyleBackColor = True
+        Me.Button4.Visible = False
+        '
         'frmServer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(541, 359)
+        Me.ClientSize = New System.Drawing.Size(541, 383)
+        Me.Controls.Add(Me.Button4)
+        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.lstConsole)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
@@ -65,7 +88,7 @@ Partial Class frmServer
         Me.MaximizeBox = False
         Me.Name = "frmServer"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "SignalR Service [Server]"
+        Me.Text = "WhatsApp BOT SignalR Service [Server]"
         Me.ResumeLayout(False)
 
     End Sub
@@ -73,4 +96,6 @@ Partial Class frmServer
     Friend WithEvents Button1 As Button
     Friend WithEvents Button2 As Button
     Private WithEvents lstConsole As ListBox
+    Friend WithEvents Button3 As Button
+    Friend WithEvents Button4 As Button
 End Class

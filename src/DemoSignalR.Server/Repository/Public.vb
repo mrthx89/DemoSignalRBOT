@@ -1,10 +1,9 @@
 ﻿Imports System.Globalization
 Imports System.Threading
-Imports DevExpress.XtraEditors
 
 Public Module [Public]
     Public MainForm As New frmServer
-    Public ClientForm As frmClient
+    'Public BOT1Form, BOT2Form, BOT3Form As frmClient
 
     <STAThread()>
     Public Sub Main()
@@ -38,8 +37,6 @@ Public Module [Public]
         Catch ex As Exception
             MsgBox("Error " & ex.Message, MsgBoxStyle.ApplicationModal)
             'MsgError("mdlPublic.Main", mdlPublic.UserAktif, ex)
-        Finally
-            Repository.RepWA.ChromeClose()
         End Try
     End Sub
 End Module

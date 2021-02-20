@@ -196,7 +196,7 @@ Partial Class frmClient
         Me.MaximizeBox = False
         Me.Name = "frmClient"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "BOT WA [Client]"
+        Me.Text = "BOT WhatsApp [Client]"
         CType(Me.img, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()

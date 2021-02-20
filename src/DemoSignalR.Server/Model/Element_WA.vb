@@ -11,6 +11,7 @@
         Public Property ELEMENT_PROFILE_10 As String
         Public Property ELEMENT_PROFILE_11 As String
         Public Property ELEMENT_PROFILE_12 As String
+        Public Property ELEMENT_PROFILE_13 As String
     End Class
 
     Public Class [Result]

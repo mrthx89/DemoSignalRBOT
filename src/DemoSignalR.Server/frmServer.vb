@@ -1,85 +1,54 @@
 ﻿Imports Microsoft.Owin.Hosting
 Imports DemoSignalR.Server.Data.Constant
 Imports OpenQA.Selenium.Chrome
-Imports DemoSignalR.Server.Repository.RepWA
 
 Public Class frmServer
     Private Property signalR As IDisposable
+    Private BOTS As New List(Of Model.BOT)
 
     Private Async Sub btnStart_ClickAsync(sender As Object, e As EventArgs) Handles Button1.Click
-        If Not chromestarted Then WriteToConsole(False, "Unconnected API WhatsApp, Lakukan Login WA Web terlebih Dahulu.") : Exit Sub
-        WriteToConsole(False, "Starting server...")
+        WriteToConsole("Starting SignalR server...")
 
         Button1.Enabled = False
         Await Task.Run(Sub() StartServer())
     End Sub
     Private Sub btnStop_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Try
-            [Public].ClientForm.Close()
-            [Public].ClientForm.Dispose()
+            For Each bot In BOTS
+                bot.WA.ChromeClose()
+                bot.BOT.Dispose()
+                WriteToConsole("BOTS " & bot.ID & " has stopped")
+            Next
+
+            DialogResult = DialogResult.Cancel
+            Me.Close()
         Catch ex As Exception
 
         End Try
-        Dim hasil = Repository.RepWA.ChromeClose()
-        WriteToConsole(False, hasil.Message)
-        DialogResult = DialogResult.Cancel
-        Me.Close()
     End Sub
+
     '<summary>
     'Starts the server And checks For Error thrown When another server Is already 
     'running. This method Is called asynchronously from Button_Start.
     '</summary>
+
     Private Sub StartServer()
-        Dim Hasil As Model.Result
+        Dim chrome_process() As Process
         Try
-            Hasil = Repository.RepWA.CheckWAOnReady()
-            If Hasil.Result Then
-                If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
-                    Using frmQRCode As New frmQRCode(Hasil)
-                        Try
-                            If frmQRCode.ShowDialog() = DialogResult.OK Then
-                                signalR = WebApp.Start(URI_SignalR)
+            chrome_process = Process.GetProcessesByName("chromedriver")
+            For Each proc In chrome_process
+                proc.Kill()
+            Next
 
-                                Button2.Invoke(Sub()
-                                                   Button2.Enabled = True
-                                               End Sub)
+            signalR = WebApp.Start(URI_SignalR)
 
-                                WriteToConsole(True, "Server started at " &
-                                               URI_SignalR)
-                            End If
-                        Catch ex As Exception
-                            WriteToConsole(False, "Server failed to start. A server is already running on " &
-                                           URI_SignalR)
-                            'Re-enable button to let user try to start server again
+            Button2.Invoke(Sub()
+                               Button2.Enabled = True
+                           End Sub)
 
-                            'Me.this.Invoke
-                            Button1.Invoke(Sub()
-                                               Button1.Enabled = True
-                                           End Sub)
-                        End Try
-                    End Using
-                Else
-                    signalR = WebApp.Start(URI_SignalR)
-
-                    Button2.Invoke(Sub()
-                                       Button2.Enabled = True
-                                   End Sub)
-
-                    WriteToConsole(True, "Server started at " &
-                                   URI_SignalR)
-                End If
-            Else
-                WriteToConsole(False, "Chrome is Not Started." &
-                           URI_SignalR)
-                'Re-enable button to let user try to start server again
-
-                'Me.this.Invoke
-                Button1.Invoke(Sub()
-                                   Button1.Enabled = True
-                               End Sub)
-            End If
+            WriteToConsole("Server started at " & URI_SignalR)
         Catch ex As Exception
-            WriteToConsole(False, "Server failed to start. A server is already running on " &
+            WriteToConsole("Server failed to start. A server is already running on " &
                            URI_SignalR)
             'Re-enable button to let user try to start server again
 
@@ -96,24 +65,12 @@ Public Class frmServer
     'from a SignalR hub thread rather than the UI thread.
     '</summary>
     '<param name="message"></param>
-    Public Sub WriteToConsole(ByVal OnLoad As Boolean, message As String)
+    Public Sub WriteToConsole(message As String)
         If lstConsole.InvokeRequired Then
             lstConsole.Invoke(Sub()
-                                  WriteToConsole(OnLoad, message)
+                                  WriteToConsole(message)
                               End Sub)
             Exit Sub
-        End If
-
-        If OnLoad AndAlso Not IsNothing(signalR) Then
-            Try
-                [Public].ClientForm.Close()
-                [Public].ClientForm.Dispose()
-            Catch exx As Exception
-
-            End Try
-            [Public].ClientForm = New frmClient
-            [Public].ClientForm.Show()
-            [Public].ClientForm.Focus()
         End If
 
         If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
@@ -133,13 +90,10 @@ Public Class frmServer
         If Not IsNothing(signalR) Then
             signalR.Dispose()
         End If
-        Repository.RepWA.ChromeClose()
     End Sub
 
     Private Sub frmServers_Load(sender As Object, e As EventArgs) Handles Me.Load
         LoadElementWA()
-        Dim hasil = Repository.RepWA.ChromeConnect()
-        WriteToConsole(False, hasil.Message)
     End Sub
 
     Private Sub LoadElementWA()
@@ -161,10 +115,7 @@ Public Class frmServer
             End If
 
             'VPoint
-            'uri = New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
-
-            'CtrlSoftID
-            uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
+            uri = New Uri("http://ctrlsoft.id/MyVPoint/Element_WA.json")
 
             Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
             Console.WriteLine(Response)
@@ -181,20 +132,72 @@ Public Class frmServer
                                                        .ELEMENT_PROFILE_9 = "input[type='file']",
                                                        .ELEMENT_PROFILE_10 = "_1yHR2",
                                                        .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
-                                                       .ELEMENT_PROFILE_12 = "data-ref"}
+                                                       .ELEMENT_PROFILE_12 = "data-ref",
+                                                       .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
             End If
         Catch ex As Exception
             ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
-                                                       .ELEMENT_PROFILE_3 = "_35EW6",
-                                                       .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
-                                                       .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
-                                                       .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
-                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']",
-                                                       .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
-                                                       .ELEMENT_PROFILE_9 = "input[type='file']",
-                                                       .ELEMENT_PROFILE_10 = "_1yHR2",
-                                                       .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
-                                                       .ELEMENT_PROFILE_12 = "data-ref"}
+                                                   .ELEMENT_PROFILE_3 = "_35EW6",
+                                                   .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
+                                                   .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
+                                                   .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
+                                                   .ELEMENT_PROFILE_7 = "span[data-icon='send']",
+                                                   .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
+                                                   .ELEMENT_PROFILE_9 = "input[type='file']",
+                                                   .ELEMENT_PROFILE_10 = "_1yHR2",
+                                                   .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
+                                                   .ELEMENT_PROFILE_12 = "data-ref",
+                                                   .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
         End Try
+    End Sub
+
+    Private IDBOT As Integer = 0
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Button3.Enabled = False
+        If Button1.Enabled = False AndAlso Not IsNothing(signalR) Then
+            IDBOT += 1
+            Dim BOT As New Model.BOT(IDBOT)
+            Threading.Thread.Sleep(5000)
+
+            Dim Hasil = BOT.WA.CheckWAOnReady()
+            If Hasil.Result Then
+                If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
+                    Using frmQRCode As New frmQRCode(Hasil, BOT.WA)
+                        Try
+                            If frmQRCode.ShowDialog(Me) = DialogResult.OK Then
+                                BOTS.Add(BOT)
+
+                                BOT.BOT.Show()
+                                BOT.BOT.Focus()
+
+                                WriteToConsole("BOT " & IDBOT & " has Started")
+                            Else
+                                'BOT.WA.ChromeClose()
+                            End If
+                        Catch ex As Exception
+                            'BOT.WA.ChromeClose()
+                            WriteToConsole("ERR : " & ex.Message)
+                        End Try
+                    End Using
+                Else
+                    BOTS.Add(BOT)
+
+                    BOT.BOT.Show()
+                    BOT.BOT.Focus()
+
+                    WriteToConsole("BOT " & IDBOT & " has Started")
+                End If
+            Else
+                'BOT.WA.ChromeClose()
+                WriteToConsole("BOT " & IDBOT & " cannot Started, " & Hasil.Message)
+            End If
+        Else
+            MsgBox("Service SignalR harus jalan dahulu.", MsgBoxStyle.Information)
+        End If
+        Button3.Enabled = True
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+
     End Sub
 End Class

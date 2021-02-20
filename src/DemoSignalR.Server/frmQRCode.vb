@@ -1,25 +1,30 @@
 ﻿Public Class frmQRCode
     Private Hasil As Model.Result
+    Private WA As Repository.RepWA
 
-    Public Sub New(ByVal Hasil As Model.Result)
+    Public Sub New(Hasil As Model.Result,
+                   WA As Repository.RepWA)
 
         ' This call is required by the designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
         Me.Hasil = Hasil
+        Me.WA = WA
     End Sub
 
     Private Sub frmQRCode_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ShowBarcode(Hasil)
+        tmrCheckQR.Interval = 3000
         tmrCheckQR.Enabled = True
+        Me.Focus()
     End Sub
 
     Private Sub tmrCheckQR_Tick(sender As Object, e As EventArgs) Handles tmrCheckQR.Tick
         tmrCheckQR.Enabled = False
         Cursor = Cursors.WaitCursor
         Try
-            Hasil = Repository.RepWA.GetQRCode()
+            Hasil = WA.GetQRCode()
             If Hasil.Result Then
                 If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
                     ShowBarcode(Hasil)

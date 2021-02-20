@@ -23,9 +23,9 @@ Public Class ServiceMain
         Try
             hubConnection = New HubConnection(My.Settings.URI_SignalR)
             hubProxy = hubConnection.CreateHubProxy("ServerHub")
-            hubProxy.On(Of Messages)("RefreshData", Sub(messages)
-                                                        FillToListView(messages)
-                                                    End Sub)
+            'hubProxy.On(Of Messages)("RefreshData", Sub(messages)
+            '                                            FillToListView(messages)
+            '                                        End Sub)
             ConnectAsync()
             hubConnection.Start().Wait()
         Catch ex As Exception
@@ -80,7 +80,9 @@ Public Class ServiceMain
                                     .Client = New DemoSignalR.Model.Client With {.ClientId = myid, .NickName = myname},
                                     .Message = Message,
                                     .NickName = myname,
-                                    .PhoneNumber = Phone}
+                                    .PhoneNumber = Phone,
+                                    .Image = "",
+                                    .File = ""}
             hubProxy.Invoke("ClientChat", messages)
 
             With json
