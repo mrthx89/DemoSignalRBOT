@@ -117,9 +117,6 @@ Public Class frmServer
             'Server CTrlSoft
             uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
 
-            'Server VPoint
-            uri = New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
-
             Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
             Console.WriteLine(Response)
             If Response IsNot Nothing AndAlso Response <> "" Then
