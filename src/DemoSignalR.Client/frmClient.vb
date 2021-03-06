@@ -3,6 +3,7 @@ Imports DemoSignalR.Model
 Imports DemoSignalR.Client.Data.Constant
 Imports System.Drawing.Imaging
 Imports System.IO
+Imports DemoSignalR.APIRef
 
 Public Class frmClient
     Private hubConnection As HubConnection
@@ -140,11 +141,11 @@ Public Class frmClient
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         Button3.Enabled = False
-        Dim messages As Messages
         Try
             Dim result = MessageBox.Show("Dengan metode dari web service atau desktop?" & vbCrLf & "YES:Web Service, NO:Desktop", NamaApplikasi, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
 
             If result = DialogResult.Yes Then
+                Dim messages As APIRef.WA.Messages
                 Dim data() As Byte = Nothing
                 If TextBox2.Text <> "" Then
                     Using fStream As New FileStream(TextBox2.Text, FileMode.Open, FileAccess.ReadWrite)
@@ -155,24 +156,34 @@ Public Class frmClient
                 End If
 
                 If (IsDBNull(img.Image) OrElse IsNothing(img.ImageLocation)) Then 'Dengan Web Service maka file nya diConvert ke ByteArray
-                    messages = New Messages With {.Server = New DemoSignalR.Model.Server With {.ServerId = "", .NickName = ""},
-                                                  .Client = New DemoSignalR.Model.Client With {.ClientId = txtClientID.Text, .NickName = "BOT_WA"},
+                    messages = New APIRef.WA.Messages With {.Server = New APIRef.WA.Server With {.ServerId = "", .NickName = ""},
+                                                  .Client = New APIRef.WA.Client With {.ClientId = txtClientID.Text, .NickName = "BOT_WA"},
                                                   .Message = txtMessage.Text,
                                                   .NickName = "BOT_WA",
                                                   .Phone = txtPhoneNumber.Text,
                                                   .Image = "",
-                                                  .File = IIf(data Is Nothing OrElse data.Length = 0, "", System.Text.Encoding.Unicode.GetString(data))}
+                                                  .File = IIf(data Is Nothing OrElse data.Length = 0, "", Convert.ToBase64String(data))}
                 Else
-                    messages = New Messages With {.Server = New DemoSignalR.Model.Server With {.ServerId = "", .NickName = ""},
-                                                  .Client = New DemoSignalR.Model.Client With {.ClientId = txtClientID.Text, .NickName = "BOT_WA"},
+                    messages = New APIRef.WA.Messages With {.Server = New APIRef.WA.Server With {.ServerId = "", .NickName = ""},
+                                                  .Client = New APIRef.WA.Client With {.ClientId = txtClientID.Text, .NickName = "BOT_WA"},
                                                   .Message = txtMessage.Text,
                                                   .NickName = "BOT_WA",
                                                   .Phone = txtPhoneNumber.Text,
                                                   .Image = Repository.Utils.ImageToBase64(img.Image, ImageFormat.Jpeg),
-                                                  .File = IIf(data Is Nothing OrElse data.Length = 0, "", System.Text.Encoding.Unicode.GetString(data))}
+                                                  .File = IIf(data Is Nothing OrElse data.Length = 0, "", Convert.ToBase64String(data))}
                 End If
-                hubProxy.Invoke("ClientChat", messages)
+
+                Dim WEP_SERVICE As String = InputBox("Alamat Web Service", NamaApplikasi, "http://localhost/SignalR")
+                Using Stream As New StreamWriter(Application.StartupPath & "\data.json", False)
+                    Stream.AutoFlush = True
+                    Stream.Write(Newtonsoft.Json.JsonConvert.SerializeObject(messages))
+                    Stream.Flush()
+                End Using
+                Dim API As New DemoSignalR.APIRef.WA.ValuesClient(New Net.Http.HttpClient)
+                API.BaseUrl = WEP_SERVICE
+                Dim Hasil = API.SendWAAsync(messages).Result
             ElseIf result = DialogResult.No Then 'Dengan Desktop maka cukup pakai filePath saja.
+                Dim messages As New DemoSignalR.Model.Messages
                 If (IsDBNull(img.Image) OrElse IsNothing(img.ImageLocation)) Then
                     messages = New Messages With {.Server = New DemoSignalR.Model.Server With {.ServerId = "", .NickName = ""},
                                                   .Client = New DemoSignalR.Model.Client With {.ClientId = txtClientID.Text, .NickName = "BOT_WA"},
@@ -187,7 +198,7 @@ Public Class frmClient
                                                   .Message = txtMessage.Text,
                                                   .NickName = "BOT_WA",
                                                   .Phone = txtPhoneNumber.Text,
-                                                  .Image = Repository.Utils.ImageToBase64(img.Image, ImageFormat.Jpeg),
+                                                  .Image = img.ImageLocation,
                                                   .File = TextBox2.Text}
                 End If
                 hubProxy.Invoke("ClientChat", messages)

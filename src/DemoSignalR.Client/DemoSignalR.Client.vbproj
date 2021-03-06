@@ -110,11 +110,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connected Services\ServiceSignalR\Reference.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="Data\Constant.vb" />
     <Compile Include="frmClient.Designer.vb">
       <DependentUpon>frmClient.vb</DependentUpon>
@@ -156,13 +151,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connected Services\ServiceSignalR\DemoSignalR.Client.ServiceSignalR.SendWAAPIModelResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceSignalR\DemoSignalR.Client.ServiceSignalR.SendWAAPIResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceSignalR\ServiceMain.wsdl" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -179,19 +167,16 @@
     <None Include="Scripts\jquery-3.3.1.slim.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DemoSignalR.APIRef\DemoSignalR.APIRef.csproj">
+      <Project>{100df9ee-95b3-4ccf-880c-9eb696416cdc}</Project>
+      <Name>DemoSignalR.APIRef</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DemoSignalR.Model\DemoSignalR.Model.csproj">
       <Project>{a512363f-b0df-4e66-9bf2-abbf8cf1aa7e}</Project>
       <Name>DemoSignalR.Model</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connected Services\ServiceSignalR\ServiceMain.disco" />
-    <None Include="Connected Services\ServiceSignalR\configuration91.svcinfo" />
-    <None Include="Connected Services\ServiceSignalR\configuration.svcinfo" />
-    <None Include="Connected Services\ServiceSignalR\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.vb</LastGenOutput>
-    </None>
     <Content Include="favicon.ico" />
     <Content Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -203,9 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Connected Services\ServiceSignalR\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
