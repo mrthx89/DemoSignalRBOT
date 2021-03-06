@@ -1,5 +1,4 @@
 ﻿Imports System.Configuration
-Imports OpenQA.Selenium.Chrome
 
 Namespace Data
     Module Constant

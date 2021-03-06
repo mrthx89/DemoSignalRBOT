@@ -50,7 +50,7 @@ namespace DemoSignalR.Model
         public string NickName { get; set; }
 
         [JsonProperty("Phone")]
-        public string PhoneNumber { get; set; }
+        public string Phone { get; set; }
 
         [JsonProperty("Message")]
         public string Message { get; set; }

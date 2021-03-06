@@ -13,12 +13,12 @@ Namespace Repository
 
         <STAThread()>
         Public Function SendWA_BOT_Bebas(ByVal Phone As String,
-                                            ByVal Message As String,
-                                            ByVal Gambar As Image,
-                                            ByVal File As String) As String
+                                                ByVal Message As String,
+                                                ByVal Gambar As Image,
+                                                ByVal File As String) As String
             Dim iTryURI As Integer = 0
             Dim iTryPageSource As Integer = 0
-            If chromestarted AndAlso driver IsNot Nothing Then
+            If ChromeStarted AndAlso driver IsNot Nothing Then
                 Try
 Label_03A0:
                     Application.DoEvents()
@@ -32,8 +32,8 @@ Label_03A0:
                         End If
                         URI = "https://web.whatsapp.com/send?phone=" & Nomor
 
-                        pagesource = driver.PageSource
-                        If Not pagesource.Contains(ElementWA.ELEMENT_PROFILE_4) Then
+                        PageSource = driver.PageSource
+                        If Not PageSource.Contains(ElementWA.ELEMENT_PROFILE_4) Then
                             If iTryURI <= 5 Then
                                 Dim Hasil = CheckWAOnReady()
                                 If Hasil.Result Then
@@ -49,7 +49,7 @@ Label_03A0:
                                 End If
 
                                 driver.Navigate.GoToUrl(URI)
-                                Thread.Sleep(2000)
+                                Thread.Sleep(3000)
 
                                 iTryURI += 1
                                 GoTo Label_03A0
@@ -58,11 +58,11 @@ Label_03A0:
                             End If
                         End If
                         driver.Navigate.GoToUrl(URI)
-                        Thread.Sleep(2000)
+                        Thread.Sleep(3000)
 Label_01FB:
                         Application.DoEvents()
                         Try
-                            If Not driver.PageSource.Contains((ElementWA.ELEMENT_PROFILE_4.ToString & """")) Then
+                            If Not driver.PageSource.Contains(ElementWA.ELEMENT_PROFILE_4.ToString & """") Then
                                 If iTryPageSource <= 10 Then
                                     iTryPageSource += 1
                                     GoTo Label_01FB
@@ -157,41 +157,49 @@ Label_0237:
             Dim result As New Model.Result(False, "Tidak ditemukan", Nothing)
             Dim URI As String = "https://web.whatsapp.com"
             Dim UlangProses As Boolean = False
-            If chromestarted AndAlso driver IsNot Nothing Then
-                If chromestarted AndAlso driver IsNot Nothing Then
-                    Try
+            If ChromeStarted AndAlso driver IsNot Nothing Then
+                Try
 Label_1:
-                        pagesource = driver.PageSource
-                        If Not pagesource.Contains(ElementWA.ELEMENT_PROFILE_4) Then
-                            If UlangProses Then
-                                Return GetQRCode()
-                            Else
-                                driver.Navigate.GoToUrl(URI)
+                    PageSource = driver.PageSource
+                    If PageSource.Contains("_1dwBj") Then
+                        Dim buttons = driver.FindElementsByClassName("_1dwBj")
+                        For Each btn In buttons
+                            If btn.Text.Replace(" ", "") = "GUNAKAN DI SINI".Replace(" ", "") OrElse btn.Text.Replace(" ", "") = "COBASEKARANG".Replace(" ", "") Then
+                                btn.Click()
                                 Thread.Sleep(3000)
                                 UlangProses = True
                                 GoTo Label_1
                             End If
+                        Next
+                    ElseIf Not PageSource.Contains(ElementWA.ELEMENT_PROFILE_4) Then
+                        If UlangProses Then
+                            Return GetQRCode()
                         Else
-                            With result
-                                .Result = True
-                                .Message = "Whatsapp On Ready"
-                                .Value = Nothing
-                            End With
+                            driver.Navigate.GoToUrl(URI)
+                            Thread.Sleep(3000)
+                            UlangProses = True
+                            GoTo Label_1
                         End If
-                    Catch ex As Exception
+                    Else
                         With result
-                            .Result = False
-                            .Message = "Whatsapp not Ready : " & ex.Message
+                            .Result = True
+                            .Message = "Whatsapp On Ready"
                             .Value = Nothing
                         End With
-                    End Try
-                Else
+                    End If
+                Catch ex As Exception
                     With result
                         .Result = False
-                        .Message = "Service is not Running."
+                        .Message = "Whatsapp not Ready : " & ex.Message
                         .Value = Nothing
                     End With
-                End If
+                End Try
+            Else
+                With result
+                    .Result = False
+                    .Message = "Service is not Running."
+                    .Value = Nothing
+                End With
             End If
 
             Return result
@@ -201,53 +209,51 @@ Label_1:
             Dim result As New Model.Result(False, "Tidak ditemukan", Nothing)
             Dim URI As String = "https://web.whatsapp.com"
             Dim UlangProses As Boolean = False, iUlang As Integer = 0
-            If chromestarted AndAlso driver IsNot Nothing Then
-                If chromestarted AndAlso driver IsNot Nothing Then
-                    Try
+            If ChromeStarted AndAlso driver IsNot Nothing Then
+                Try
 Label_1:
-                        pagesource = driver.PageSource
-                        If iUlang <= 3 AndAlso pagesource.Contains(ElementWA.ELEMENT_PROFILE_11) Then
-                            driver.Navigate.GoToUrl(URI)
-                            Thread.Sleep(2000)
-                            iUlang += 1
-                            GoTo Label_1
-                        End If
+                    PageSource = driver.PageSource
+                    If iUlang <= 3 AndAlso PageSource.Contains(ElementWA.ELEMENT_PROFILE_11) Then
+                        driver.Navigate.GoToUrl(URI)
+                        Thread.Sleep(2000)
+                        iUlang += 1
+                        GoTo Label_1
+                    End If
 
-                        If pagesource.Contains(ElementWA.ELEMENT_PROFILE_10) Then
-                            Dim Data As String = driver.FindElementByClassName(ElementWA.ELEMENT_PROFILE_10).GetAttribute(ElementWA.ELEMENT_PROFILE_12)
+                    If PageSource.Contains(ElementWA.ELEMENT_PROFILE_10) Then
+                        Dim Data As String = driver.FindElementByClassName(ElementWA.ELEMENT_PROFILE_10).GetAttribute(ElementWA.ELEMENT_PROFILE_12)
+                        With result
+                            .Result = True
+                            .Message = "Whatsapp QRCode Ready"
+                            .Value = Data
+                        End With
+                    Else
+                        If UlangProses Then
                             With result
-                                .Result = True
-                                .Message = "Whatsapp QRCode Ready"
-                                .Value = Data
+                                .Result = False
+                                .Message = "Whatsapp Not Ready"
+                                .Value = Nothing
                             End With
                         Else
-                            If UlangProses Then
-                                With result
-                                    .Result = False
-                                    .Message = "Whatsapp Not Ready"
-                                    .Value = Nothing
-                                End With
-                            Else
-                                driver.Navigate.GoToUrl(URI)
-                                Thread.Sleep(2000)
-                                UlangProses = True
-                                GoTo Label_1
-                            End If
+                            driver.Navigate.GoToUrl(URI)
+                            Thread.Sleep(2000)
+                            UlangProses = True
+                            GoTo Label_1
                         End If
-                    Catch ex As Exception
-                        With result
-                            .Result = False
-                            .Message = "Whatsapp not Ready : " & ex.Message
-                            .Value = Nothing
-                        End With
-                    End Try
-                Else
+                    End If
+                Catch ex As Exception
                     With result
                         .Result = False
-                        .Message = "Service is not Running."
+                        .Message = "Whatsapp not Ready : " & ex.Message
                         .Value = Nothing
                     End With
-                End If
+                End Try
+            Else
+                With result
+                    .Result = False
+                    .Message = "Service is not Running."
+                    .Value = Nothing
+                End With
             End If
             Return result
         End Function
@@ -275,9 +281,11 @@ Label_1:
                     .Value = Nothing
                 End With
             End Try
-            chromestarted = Not Hasil.Result
+            ChromeStarted = Not Hasil.Result
             Return Hasil
         End Function
+
+        Public Property ModeSenyap As Boolean
 
         Public Function ChromeConnect(ByVal IDBOT As Integer) As Model.Result
             Dim Hasil As New Model.Result(False, "", Nothing)
@@ -300,9 +308,11 @@ Label_1:
 
                 options.AddArguments("no-sandbox")
                 If MsgBox("Ingin menampilkan Windows Browser atau dalam Mode Senyap?" & vbCrLf & "YES : Mode Senyap, NO : POP UP WINDOW", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
+                    Me.ModeSenyap = True
                     options.AddArguments("--headless") '//hide browser
                     options.AddArguments("--start-maximized")
                 Else
+                    Me.ModeSenyap = False
                     options.AddArguments("--window-position=-32000,-32000")
                     options.AddArguments("--start-minimize")
                 End If
@@ -353,11 +363,11 @@ Label_1:
                 driver = New ChromeDriver(service, options)
                 driver.Navigate.GoToUrl("https://web.whatsapp.com")
                 Thread.Sleep(2000)
-                pagesource = driver.PageSource
+                PageSource = driver.PageSource
                 With Hasil
                     .Result = True
                     .Message = "Chrome is Started."
-                    .Value = pagesource
+                    .Value = PageSource
                 End With
             Catch ex As Exception
                 If driver IsNot Nothing Then
@@ -371,7 +381,7 @@ Label_1:
                     .Value = Nothing
                 End With
             End Try
-            chromestarted = Hasil.Result
+            ChromeStarted = Hasil.Result
             Return Hasil
         End Function
     End Class

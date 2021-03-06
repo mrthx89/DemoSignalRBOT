@@ -114,8 +114,11 @@ Public Class frmServer
                 End Using
             End If
 
-            'VPoint
-            uri = New Uri("http://ctrlsoft.id/MyVPoint/Element_WA.json")
+            'Server CTrlSoft
+            uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
+
+            'Server VPoint
+            uri = New Uri("http://vpoint.id/MyVPoint/Element_WA.json")
 
             Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
             Console.WriteLine(Response)
@@ -160,37 +163,42 @@ Public Class frmServer
             Threading.Thread.Sleep(5000)
 
             Dim Hasil = BOT.WA.CheckWAOnReady()
-            If Hasil.Result Then
-                If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
-                    Using frmQRCode As New frmQRCode(Hasil, BOT.WA)
-                        Try
-                            If frmQRCode.ShowDialog(Me) = DialogResult.OK Then
-                                BOTS.Add(BOT)
+            Try
+                If Hasil.Result Then
+                    If Hasil.Message.Equals("Whatsapp QRCode Ready") Then
+                        Using frmQRCode As New frmQRCode(Hasil, BOT.WA)
+                            Try
+                                If frmQRCode.ShowDialog(Me) = DialogResult.OK Then
+                                    BOTS.Add(BOT)
 
-                                BOT.BOT.Show()
-                                BOT.BOT.Focus()
+                                    BOT.BOT.Show()
+                                    BOT.BOT.Focus()
 
-                                WriteToConsole("BOT " & IDBOT & " has Started")
-                            Else
-                                'BOT.WA.ChromeClose()
-                            End If
-                        Catch ex As Exception
-                            'BOT.WA.ChromeClose()
-                            WriteToConsole("ERR : " & ex.Message)
-                        End Try
-                    End Using
+                                    WriteToConsole("BOT " & IDBOT & " has Started")
+                                Else
+                                    BOT.WA.ChromeClose()
+                                End If
+                            Catch ex As Exception
+                                BOT.WA.ChromeClose()
+                                WriteToConsole("ERR : " & ex.Message)
+                            End Try
+                        End Using
+                    Else
+                        BOTS.Add(BOT)
+
+                        BOT.BOT.Show()
+                        BOT.BOT.Focus()
+
+                        WriteToConsole("BOT " & IDBOT & " has Started")
+                    End If
                 Else
-                    BOTS.Add(BOT)
-
-                    BOT.BOT.Show()
-                    BOT.BOT.Focus()
-
-                    WriteToConsole("BOT " & IDBOT & " has Started")
+                    BOT.WA.ChromeClose()
+                    WriteToConsole("BOT " & IDBOT & " cannot Started, " & Hasil.Message)
                 End If
-            Else
-                'BOT.WA.ChromeClose()
+            Catch ex As Exception
+                BOT.WA.ChromeClose()
                 WriteToConsole("BOT " & IDBOT & " cannot Started, " & Hasil.Message)
-            End If
+            End Try
         Else
             MsgBox("Service SignalR harus jalan dahulu.", MsgBoxStyle.Information)
         End If

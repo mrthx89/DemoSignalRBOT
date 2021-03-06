@@ -1,6 +1,5 @@
 ﻿Imports System.Globalization
 Imports System.Threading
-Imports DevExpress.XtraEditors
 
 Public Module [Public]
     Public MainForm As New frmClient

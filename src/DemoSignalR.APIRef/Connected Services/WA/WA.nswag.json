@@ -1,0 +1,125 @@
+﻿{
+  "swagger": "2.0",
+  "info": {
+    "title": "DemoSignalR.WebAPI",
+    "version": "v1"
+  },
+  "host": "localhost",
+  "basePath": "/SignalR",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/SendWA": {
+      "post": {
+        "tags": [
+          "Values"
+        ],
+        "operationId": "Values_SendWA",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Messages"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/JSONResult"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Messages": {
+      "type": "object",
+      "properties": {
+        "Server": {
+          "$ref": "#/definitions/Server"
+        },
+        "ServerId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "Client": {
+          "$ref": "#/definitions/Client"
+        },
+        "ClientId": {
+          "type": "string",
+          "readOnly": true
+        },
+        "NickName": {
+          "type": "string"
+        },
+        "Phone": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Image": {
+          "type": "string"
+        },
+        "File": {
+          "type": "string"
+        }
+      }
+    },
+    "Server": {
+      "type": "object",
+      "properties": {
+        "ServerId": {
+          "type": "string"
+        },
+        "NickName": {
+          "type": "string"
+        }
+      }
+    },
+    "Client": {
+      "type": "object",
+      "properties": {
+        "ClientId": {
+          "type": "string"
+        },
+        "NickName": {
+          "type": "string"
+        }
+      }
+    },
+    "JSONResult": {
+      "type": "object",
+      "properties": {
+        "JSONMessage": {
+          "type": "string"
+        },
+        "JSONResult": {
+          "type": "boolean"
+        },
+        "JSONRows": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "JSONValue": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
