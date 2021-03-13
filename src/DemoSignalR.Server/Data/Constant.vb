@@ -4,6 +4,7 @@ Imports OpenQA.Selenium.Chrome
 Namespace Data
     Module Constant
         Public NamaApplikasi As String = Application.ProductName.ToString
+        Public Property URI_ELEMENTS As String = ""
         'Public UserLogin As New Model.User With {.NoID = -1, .Kode = "", .Nama = "", .Pwd = "", .Supervisor = False}
         Public ElementWA As New Model.Element_WA
 

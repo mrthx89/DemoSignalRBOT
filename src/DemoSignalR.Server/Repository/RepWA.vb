@@ -11,6 +11,53 @@ Namespace Repository
         Public PageSource As String
         Public [options] As ChromeOptions = Nothing
 
+        Public Sub New(ByVal IDBOT As Integer)
+            Me.IDBOT = IDBOT
+            LoadElementWA()
+        End Sub
+
+        Private Function LoadElementWA() As Boolean
+            Dim Response As String = ""
+            Dim uri As Uri = Nothing
+            Dim FileName As String = ""
+            Try
+                'Server CTrlSoft
+                uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
+                Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
+                Console.WriteLine(Response)
+                If Response IsNot Nothing AndAlso Response <> "" Then
+                    ElementWA = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Model.Element_WA)(Response.Replace(vbLf & vbTab, ""))
+                Else
+                    ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
+                                                       .ELEMENT_PROFILE_3 = "_35EW6",
+                                                       .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
+                                                       .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
+                                                       .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
+                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']",
+                                                       .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
+                                                       .ELEMENT_PROFILE_9 = "input[type='file']",
+                                                       .ELEMENT_PROFILE_10 = "_1yHR2",
+                                                       .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
+                                                       .ELEMENT_PROFILE_12 = "data-ref",
+                                                       .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
+                End If
+            Catch ex As Exception
+                ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
+                                                   .ELEMENT_PROFILE_3 = "_35EW6",
+                                                   .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
+                                                   .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
+                                                   .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
+                                                   .ELEMENT_PROFILE_7 = "span[data-icon='send']",
+                                                   .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
+                                                   .ELEMENT_PROFILE_9 = "input[type='file']",
+                                                   .ELEMENT_PROFILE_10 = "_1yHR2",
+                                                   .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
+                                                   .ELEMENT_PROFILE_12 = "data-ref",
+                                                   .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
+            End Try
+            Return True
+        End Function
+
         <STAThread()>
         Public Function SendWA_BOT_Bebas(ByVal Phone As String,
                                                 ByVal Message As String,
@@ -286,12 +333,13 @@ Label_1:
         End Function
 
         Public Property ModeSenyap As Boolean
-
-        Public Function ChromeConnect(ByVal IDBOT As Integer) As Model.Result
+        Public Property IDBOT As Integer
+        Public Function ChromeConnect() As Model.Result
             Dim Hasil As New Model.Result(False, "", Nothing)
 
             Dim service As ChromeDriverService
             Dim DEFAULT_USER_AGENT As String = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36"
+            Cursor.Current = Cursors.WaitCursor
             Try
                 If driver IsNot Nothing Then
                     driver.Close()
@@ -300,23 +348,29 @@ Label_1:
                 driver = Nothing
 
                 [options] = New ChromeOptions
-                'Hide Windows
-                'argumentsToAdd = New String() {
-                '    "--window-position=-32000,-32000",
-                '    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech_" & IDBOT
-                '}
-
                 options.AddArguments("no-sandbox")
-                If MsgBox("Ingin menampilkan Windows Browser atau dalam Mode Senyap?" & vbCrLf & "YES : Mode Senyap, NO : POP UP WINDOW", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
-                    Me.ModeSenyap = True
-                    options.AddArguments("--headless") '//hide browser
-                    options.AddArguments("--start-maximized")
-                Else
-                    Me.ModeSenyap = False
-                    options.AddArguments("--window-position=-32000,-32000")
-                    options.AddArguments("--start-minimize")
-                End If
-                'options.AddArguments(ElementWA.ELEMENT_PROFILE_2 & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech_" & IDBOT)
+                Select Case My.Settings.ModeSenyap
+                    Case 0 'ModeSenyap=False
+                        Me.ModeSenyap = True
+                        options.AddArguments("--headless") '//hide browser
+                        options.AddArguments("--start-maximized")
+                    Case 1 'ModeSenyap=True
+                        Me.ModeSenyap = False
+                        options.AddArguments("--window-position=-32000,-32000")
+                        options.AddArguments("--start-minimize")
+                        options.AddArguments(ElementWA.ELEMENT_PROFILE_2 & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech_" & IDBOT)
+                    Case Else 'ModeSenyap ditanya
+                        If MsgBox("Ingin menampilkan Windows Browser atau dalam Mode Senyap?" & vbCrLf & "YES : Mode Senyap, NO : POP UP WINDOW", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.Yes Then
+                            Me.ModeSenyap = True
+                            options.AddArguments("--headless") '//hide browser
+                            options.AddArguments("--start-maximized")
+                        Else
+                            Me.ModeSenyap = False
+                            options.AddArguments("--window-position=-32000,-32000")
+                            options.AddArguments("--start-minimize")
+                            options.AddArguments(ElementWA.ELEMENT_PROFILE_2 & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech_" & IDBOT)
+                        End If
+                End Select
                 options.AddArguments("--disable-extensions")
                 options.AddArguments("--test-type")
                 options.AddArguments("--ignore-certificate-errors")
@@ -324,38 +378,6 @@ Label_1:
                 options.AddArguments("--silent")
                 options.AddArguments("--disable-infobars")
                 options.AddArguments("--user-agent=" + DEFAULT_USER_AGENT)
-
-                'options.BinaryLocation = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-
-                'If System.IO.File.Exists("C:\Program Files\Google\Chrome\Application\chrome.exe") Then
-                '    options.BinaryLocation = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-                'Else
-                '    If System.IO.File.Exists("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe") Then
-                '        options.BinaryLocation = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-                '    Else
-                '        Using file As New OpenFileDialog
-                '            Try
-                '                file.Title = "Open Chrome Application"
-                '                file.Filter = "Chrome Application|chrome.exe"
-                '                If file.ShowDialog() Then
-                '                    RepLog.SaveLog("ChromePath.txt", file.FileName, False)
-                '                    options.BinaryLocation = file.FileName
-                '                End If
-                '            Catch ex As Exception
-                '                With Hasil
-                '                    .Result = False
-                '                    .Message = "Error : " & ex.Message
-                '                    .Value = Nothing
-                '                End With
-                '            End Try
-                '        End Using
-                '    End If
-                'End If
-
-                'Visible Windows
-                'argumentsToAdd = New String() {
-                '    ElementWA.ELEMENT_PROFILE_2.ToString & "=" & Application.StartupPath.Replace("\", "\\") & "\\dreamtech_" & IDBOT
-                '}
 
                 service = ChromeDriverService.CreateDefaultService()
                 service.HideCommandPromptWindow = True
@@ -382,6 +404,7 @@ Label_1:
                 End With
             End Try
             ChromeStarted = Hasil.Result
+            Cursor.Current = Cursors.Default
             Return Hasil
         End Function
     End Class

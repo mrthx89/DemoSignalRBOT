@@ -19,9 +19,12 @@ Public Class frmServer
                 bot.BOT.Dispose()
                 WriteToConsole("BOTS " & bot.ID & " has stopped")
             Next
-
-            DialogResult = DialogResult.Cancel
-            Me.Close()
+            If Not IsNothing(signalR) Then
+                signalR.Dispose()
+                WriteToConsole("Server stopped at " & URI_SignalR)
+                Button1.Enabled = True
+                Button2.Enabled = False
+            End If
         Catch ex As Exception
 
         End Try
@@ -86,69 +89,32 @@ Public Class frmServer
         End Using
         lstConsole.Items.Add(Log)
     End Sub
+
     Private Sub frmServer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If Not IsNothing(signalR) Then
-            signalR.Dispose()
+        If Not Button1.Enabled Then
+            e.Cancel = True
+        Else
+            If Not IsNothing(signalR) Then
+                signalR.Dispose()
+            End If
         End If
     End Sub
 
     Private Sub frmServers_Load(sender As Object, e As EventArgs) Handles Me.Load
-        LoadElementWA()
-    End Sub
+        Dim FileName As String = ""
+        'Buka Log sebelumnya
+        If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
+            System.IO.Directory.CreateDirectory(Application.StartupPath & "\Log\")
+        End If
 
-    Private Sub LoadElementWA()
-        Dim Response As String = ""
-        Dim uri As Uri = Nothing
-        Try
-            'Buka Log sebelumnya
-            If Not System.IO.Directory.Exists(Application.StartupPath & "\Log\") Then
-                System.IO.Directory.CreateDirectory(Application.StartupPath & "\Log\")
-            End If
-
-            Dim FileName As String = Application.StartupPath & "\Log\Server_" & Now.ToString("yyyyMMdd") & ".txt"
-            If System.IO.File.Exists(FileName) Then
-                Using myStream As New System.IO.StreamReader(FileName)
-                    While Not myStream.Read
-                        lstConsole.Items.Add(myStream.ReadLine)
-                    End While
-                End Using
-            End If
-
-            'Server CTrlSoft
-            uri = New Uri("http://ctrlsoft.id/wa_automation/element_wa.json")
-
-            Response = Repository.Utils.SendRequest(uri, Nothing, "application/json", "GET")
-            Console.WriteLine(Response)
-            If Response IsNot Nothing AndAlso Response <> "" Then
-                ElementWA = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Model.Element_WA)(Response.Replace(vbLf & vbTab, ""))
-            Else
-                ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
-                                                       .ELEMENT_PROFILE_3 = "_35EW6",
-                                                       .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
-                                                       .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
-                                                       .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
-                                                       .ELEMENT_PROFILE_7 = "span[data-icon='send']",
-                                                       .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
-                                                       .ELEMENT_PROFILE_9 = "input[type='file']",
-                                                       .ELEMENT_PROFILE_10 = "_1yHR2",
-                                                       .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
-                                                       .ELEMENT_PROFILE_12 = "data-ref",
-                                                       .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
-            End If
-        Catch ex As Exception
-            ElementWA = New Model.Element_WA With {.ELEMENT_PROFILE_2 = "user-data-dir",
-                                                   .ELEMENT_PROFILE_3 = "_35EW6",
-                                                   .ELEMENT_PROFILE_4 = "copyable-text selectable-text",
-                                                   .ELEMENT_PROFILE_5 = "//*[@id='main']/footer/div[1]/div[2]/div/div[2]",
-                                                   .ELEMENT_PROFILE_6 = "span[data-icon='send-light']",
-                                                   .ELEMENT_PROFILE_7 = "span[data-icon='send']",
-                                                   .ELEMENT_PROFILE_8 = "span[data-icon='clip']",
-                                                   .ELEMENT_PROFILE_9 = "input[type='file']",
-                                                   .ELEMENT_PROFILE_10 = "_1yHR2",
-                                                   .ELEMENT_PROFILE_11 = "_1yHR2 UlvkP",
-                                                   .ELEMENT_PROFILE_12 = "data-ref",
-                                                   .ELEMENT_PROFILE_13 = "//div[@class='_3ipVb']//div[@role='button']"}
-        End Try
+        FileName = Application.StartupPath & "\Log\Server_" & Now.ToString("yyyyMMdd") & ".txt"
+        If System.IO.File.Exists(FileName) Then
+            Using myStream As New System.IO.StreamReader(FileName)
+                Dim Str As String = myStream.ReadToEnd().TrimEnd
+                Dim data() As String = Str.Split(vbCrLf)
+                lstConsole.Items.AddRange(data)
+            End Using
+        End If
     End Sub
 
     Private IDBOT As Integer = 0
@@ -200,9 +166,5 @@ Public Class frmServer
             MsgBox("Service SignalR harus jalan dahulu.", MsgBoxStyle.Information)
         End If
         Button3.Enabled = True
-    End Sub
-
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-
     End Sub
 End Class

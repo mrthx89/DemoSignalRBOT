@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -56,23 +56,20 @@ Namespace My
         
         <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1:8801")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("http://127.0.0.1:8088")>  _
         Public ReadOnly Property URI_SignalR() As String
             Get
                 Return CType(Me("URI_SignalR"),String)
             End Get
         End Property
         
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Elliteser")>  _
-        Public Property NamaPerusahaan() As String
+         Global.System.Configuration.DefaultSettingValueAttribute("CTrlSoft Comp")>  _
+        Public ReadOnly Property NamaPerusahaan() As String
             Get
                 Return CType(Me("NamaPerusahaan"),String)
             End Get
-            Set
-                Me("NamaPerusahaan") = value
-            End Set
         End Property
     End Class
 End Namespace

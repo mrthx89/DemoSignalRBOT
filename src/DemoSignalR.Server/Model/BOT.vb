@@ -6,8 +6,8 @@
 
         Public Sub New(ByVal IDBOT As Integer)
             Me.ID = IDBOT
-            Me.WA = New Repository.RepWA
-            Me.WA.ChromeConnect(Me.ID)
+            Me.WA = New Repository.RepWA(Me.ID)
+            Me.WA.ChromeConnect()
             Me.BOT = New frmClient(ID, WA)
         End Sub
 
